@@ -1,6 +1,7 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
+  const supabaseAdmin = getSupabaseAdmin()
   // create a demo driver profile (id must match an auth.users id in your Supabase project for full relation)
   const demo = {
     id: '00000000-0000-0000-0000-000000000001',
