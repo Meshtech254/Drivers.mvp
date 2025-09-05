@@ -16,28 +16,38 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-gradient-to-r from-blue-50 to-green-50 shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Left Side - Driver Dashboard */}
+          <div className="hidden md:flex">
+            {session?.user && (
+              <Link href="/drivers/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-white/50">
+                Driver Dashboard
+              </Link>
+            )}
+          </div>
+
+          {/* Center - Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">E</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">EasyDriversHire</span>
+            <span className="text-xl font-bold text-gray-900">
+              <span className="text-blue-600">Easy</span>
+              <span className="text-green-600">Driver</span>
+              <span className="text-orange-500">Hire</span>
+            </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Right Side - Navigation and Employer Dashboard */}
+          <div className="hidden md:flex items-center space-x-4">
             <Link href="/drivers" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               Browse Drivers
             </Link>
             {session?.user ? (
-              <div className="flex items-center space-x-4">
-                <Link href="/drivers/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
-                  Driver Dashboard
-                </Link>
-                <Link href="/employer/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+              <>
+                <Link href="/employer/dashboard" className="text-gray-700 hover:text-green-600 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-white/50">
                   Employer Dashboard
                 </Link>
                 <div className="flex items-center space-x-2">
@@ -53,7 +63,7 @@ export default function Navigation() {
                     Logout
                   </button>
                 </div>
-              </div>
+              </>
             ) : (
               <Link href="/auth/auth" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
                 Sign Up / Login
@@ -84,7 +94,7 @@ export default function Navigation() {
                   <Link href="/drivers/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
                     Driver Dashboard
                   </Link>
-                  <Link href="/employer/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+                  <Link href="/employer/dashboard" className="text-gray-700 hover:text-green-600 transition-colors font-medium">
                     Employer Dashboard
                   </Link>
                   <div className="flex items-center space-x-2 pt-2">

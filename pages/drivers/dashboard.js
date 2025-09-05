@@ -10,6 +10,7 @@ export default function DriverDashboard() {
   const [isAvailable, setIsAvailable] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [photoPreview, setPhotoPreview] = useState('')
+  const [saveMessage, setSaveMessage] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -35,12 +36,19 @@ export default function DriverDashboard() {
   async function toggleAvailability() {
     const next = !isAvailable
     setIsAvailable(next)
+    try {
     await fetch('/api/drivers/toggle-availability', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: session.user.id, is_available: next })
     })
-    loadProfile(session.user.id)
+      // Don't reload profile immediately to prevent state reset
+      // loadProfile(session.user.id)
+    } catch (error) {
+      console.error('Error toggling availability:', error)
+      // Revert state on error
+      setIsAvailable(!next)
+    }
   }
 
   async function saveProfile(e) {
@@ -55,12 +63,20 @@ export default function DriverDashboard() {
       vehicle_type: e.target.vehicle_type.value,
       license_type: e.target.license_type.value
     }
+    try {
     await fetch('/api/drivers/update-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: session.user.id, updates })
     })
+      setSaveMessage('Profile saved successfully!')
+      setTimeout(() => setSaveMessage(''), 3000) // Clear message after 3 seconds
     loadProfile(session.user.id)
+    } catch (error) {
+      console.error('Error saving profile:', error)
+      setSaveMessage('Error saving profile. Please try again.')
+      setTimeout(() => setSaveMessage(''), 3000)
+    }
   }
 
   async function handleUpload(e) {
@@ -122,7 +138,7 @@ export default function DriverDashboard() {
               <div className="card-header">
                 <h3 className="text-xl font-semibold text-gray-900">Availability Status</h3>
               </div>
-              <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-600">Current status</p>
                   <p className="text-sm text-gray-500">Toggle your availability for new bookings</p>
@@ -135,10 +151,10 @@ export default function DriverDashboard() {
                       : 'bg-gray-500 text-white hover:bg-gray-600'
                   }`}
                 >
-                  {isAvailable ? 'Available' : 'Unavailable'}
-                </button>
-              </div>
-            </div>
+            {isAvailable ? 'Available' : 'Unavailable'}
+          </button>
+        </div>
+      </div>
 
             {/* Profile Photo */}
             <div className="card">
@@ -164,7 +180,7 @@ export default function DriverDashboard() {
                       className="form-input" 
                     />
                   </div>
-                  <div>
+          <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Upload Photo</label>
                     <input 
                       type="file" 
@@ -174,15 +190,24 @@ export default function DriverDashboard() {
                       className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                     />
                     {uploading && <p className="text-sm text-blue-600 mt-2">Uploading...</p>}
-                  </div>
-                </div>
-              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
             {/* Profile Form */}
             <div className="card">
               <div className="card-header">
                 <h3 className="text-xl font-semibold text-gray-900">Profile Information</h3>
+                {saveMessage && (
+                  <div className={`mt-4 p-3 rounded-lg text-sm font-medium ${
+                    saveMessage.includes('successfully') 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
+                    {saveMessage}
+                  </div>
+                )}
               </div>
               <form onSubmit={saveProfile} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -207,10 +232,10 @@ export default function DriverDashboard() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Availability</label>
                     <select name="availability" defaultValue={profile?.availability || ''} className="form-select">
-                      <option value="">Select availability</option>
-                      <option value="part-time">Part-time</option>
-                      <option value="full-time">Full-time</option>
-                    </select>
+          <option value="">Select availability</option>
+          <option value="part-time">Part-time</option>
+          <option value="full-time">Full-time</option>
+        </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
@@ -235,12 +260,12 @@ export default function DriverDashboard() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Vehicle Type</label>
                     <select name="vehicle_type" defaultValue={profile?.vehicle_type || ''} className="form-select">
                       <option value="">Select vehicle type</option>
-                      <option value="truck">Truck</option>
-                      <option value="taxi">Taxi</option>
-                      <option value="personal car">Personal car</option>
-                    </select>
+          <option value="truck">Truck</option>
+          <option value="taxi">Taxi</option>
+          <option value="personal car">Personal car</option>
+        </select>
                   </div>
-                  <div className="md:col-span-2">
+        <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">License Type</label>
                     <input 
                       name="license_type" 
@@ -324,7 +349,7 @@ export default function DriverDashboard() {
               <h3 className="text-xl font-semibold text-gray-900">All Bookings</h3>
             </div>
             <div className="space-y-4">
-              {bookings.map(b => (
+          {bookings.map(b => (
                 <div key={b.id} className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex-1">
@@ -361,7 +386,7 @@ export default function DriverDashboard() {
               )}
             </div>
           </div>
-        </div>
+      </div>
       </main>
       
       <Footer />

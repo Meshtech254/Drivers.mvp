@@ -29,8 +29,12 @@ export default function Home() {
           <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-32">
             <div className="text-center">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-                Find Trusted
-                <span className="block text-blue-200">Drivers Near You</span>
+                <span className="block">
+                  <span className="text-blue-200">Easy</span>
+                  <span className="text-green-200">Driver</span>
+                  <span className="text-orange-200">Hire</span>
+                </span>
+                <span className="block text-white">Find Trusted Drivers Near You</span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
                 Connect with reliable drivers across Kenya. Part-time or full-time opportunities in Nairobi, Kisumu, and more.
