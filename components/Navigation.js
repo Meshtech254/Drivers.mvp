@@ -16,7 +16,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="bg-gradient-to-r from-blue-50 to-green-50 shadow-lg border-b border-gray-200">
+    <nav className="nav-bg-gradient bg-gradient-to-r from-blue-50 to-green-50 shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           {/* Left Side - Driver Dashboard */}
@@ -34,9 +34,9 @@ export default function Navigation() {
               <span className="text-white font-bold text-sm">E</span>
             </div>
             <span className="text-xl font-bold text-gray-900">
-              <span className="text-blue-600">Easy</span>
-              <span className="text-green-600">Driver</span>
-              <span className="text-orange-500">Hire</span>
+              <span className="company-name-blue text-blue-600">Easy</span>
+              <span className="company-name-green text-green-600">Driver</span>
+              <span className="company-name-orange text-orange-500">Hire</span>
             </span>
           </Link>
 

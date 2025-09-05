@@ -53,6 +53,8 @@ export default function DriverDashboard() {
 
   async function saveProfile(e) {
     e.preventDefault()
+    setSaveMessage('Saving profile...')
+    
     const updates = {
       full_name: e.target.full_name.value,
       photo_url: e.target.photo_url.value,
@@ -63,42 +65,103 @@ export default function DriverDashboard() {
       vehicle_type: e.target.vehicle_type.value,
       license_type: e.target.license_type.value
     }
+    
     try {
-    await fetch('/api/drivers/update-profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: session.user.id, updates })
-    })
-      setSaveMessage('Profile saved successfully!')
-      setTimeout(() => setSaveMessage(''), 3000) // Clear message after 3 seconds
-    loadProfile(session.user.id)
+      const response = await fetch('/api/drivers/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: session.user.id, updates })
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok && result.success) {
+        setSaveMessage('Profile saved successfully!')
+        setTimeout(() => setSaveMessage(''), 3000)
+        loadProfile(session.user.id)
+      } else {
+        console.error('API Error:', result)
+        setSaveMessage(result.error || 'Error saving profile. Please try again.')
+        setTimeout(() => setSaveMessage(''), 5000)
+      }
     } catch (error) {
-      console.error('Error saving profile:', error)
-      setSaveMessage('Error saving profile. Please try again.')
-      setTimeout(() => setSaveMessage(''), 3000)
+      console.error('Network Error:', error)
+      setSaveMessage('Network error. Please check your connection and try again.')
+      setTimeout(() => setSaveMessage(''), 5000)
     }
   }
 
   async function handleUpload(e) {
     const file = e.target.files?.[0]
     if (!file || !session?.user?.id) return
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setSaveMessage('Please select an image file (JPG, PNG, etc.)')
+      setTimeout(() => setSaveMessage(''), 3000)
+      return
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveMessage('File size must be less than 5MB')
+      setTimeout(() => setSaveMessage(''), 3000)
+      return
+    }
+    
     setUploading(true)
+    setSaveMessage('Uploading image...')
+    
     try {
       const ext = file.name.split('.').pop()
-      const path = `${session.user.id}/${Date.now()}.${ext}`
-      const { data, error } = await supabase.storage.from('driver-photos').upload(path, file, { upsert: true })
-      if (error) throw error
-      const { data: pub } = supabase.storage.from('driver-photos').getPublicUrl(path)
-      const photoUrl = pub.publicUrl
+      const fileName = `${session.user.id}_${Date.now()}.${ext}`
+      const path = `driver-photos/${fileName}`
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('driver-photos')
+        .upload(path, file, { 
+          upsert: true,
+          cacheControl: '3600'
+        })
+        
+      if (error) {
+        console.error('Upload error:', error)
+        throw new Error(`Upload failed: ${error.message}`)
+      }
+      
+      // Get public URL
+      const { data: pubData } = supabase.storage
+        .from('driver-photos')
+        .getPublicUrl(path)
+      
+      const photoUrl = pubData.publicUrl
       setPhotoPreview(photoUrl)
-      await fetch('/api/drivers/update-profile', {
+      
+      // Update profile with new photo URL
+      const response = await fetch('/api/drivers/update-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: session.user.id, updates: { photo_url: photoUrl } })
+        body: JSON.stringify({ 
+          id: session.user.id, 
+          updates: { photo_url: photoUrl } 
+        })
       })
-      loadProfile(session.user.id)
+      
+      const result = await response.json()
+      
+      if (response.ok && result.success) {
+        setSaveMessage('Photo uploaded successfully!')
+        setTimeout(() => setSaveMessage(''), 3000)
+        loadProfile(session.user.id)
+      } else {
+        throw new Error(result.error || 'Failed to update profile with new photo')
+      }
+      
     } catch (err) {
-      alert('Upload failed')
+      console.error('Upload error:', err)
+      setSaveMessage(`Upload failed: ${err.message}`)
+      setTimeout(() => setSaveMessage(''), 5000)
     } finally {
       setUploading(false)
     }

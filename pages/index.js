@@ -19,7 +19,7 @@ export default function Home() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen body-bg-gradient bg-gray-50">
       <Navigation />
       
       <main>
@@ -30,9 +30,9 @@ export default function Home() {
             <div className="text-center">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
                 <span className="block">
-                  <span className="text-blue-200">Easy</span>
-                  <span className="text-green-200">Driver</span>
-                  <span className="text-orange-200">Hire</span>
+                  <span className="company-name-blue text-blue-200">Easy</span>
+                  <span className="company-name-green text-green-200">Driver</span>
+                  <span className="company-name-orange text-orange-200">Hire</span>
                 </span>
                 <span className="block text-white">Find Trusted Drivers Near You</span>
               </h1>

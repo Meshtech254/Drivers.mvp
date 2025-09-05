@@ -2,15 +2,15 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-gray-800 to-gray-900 text-white">
+    <footer className="footer-bg-gradient bg-gradient-to-r from-gray-800 to-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-2xl font-bold mb-4">
-              <span className="text-blue-400">Easy</span>
-              <span className="text-green-400">Driver</span>
-              <span className="text-orange-400">Hire</span>
+              <span className="company-name-blue text-blue-400">Easy</span>
+              <span className="company-name-green text-green-400">Driver</span>
+              <span className="company-name-orange text-orange-400">Hire</span>
             </h3>
             <p className="text-gray-300 mb-6 max-w-md">
               Connecting trusted drivers with employers across Kenya. Find reliable transportation solutions for your business needs.
