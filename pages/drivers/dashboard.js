@@ -117,6 +117,8 @@ export default function DriverDashboard() {
       const fileName = `${session.user.id}_${Date.now()}.${ext}`
       const path = `driver-photos/${fileName}`
       
+      console.log('Uploading file:', fileName, 'to path:', path)
+      
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from('driver-photos')
@@ -127,8 +129,18 @@ export default function DriverDashboard() {
         
       if (error) {
         console.error('Upload error:', error)
+        
+        // Check if it's a bucket not found error
+        if (error.message.includes('Bucket not found') || error.message.includes('bucket')) {
+          setSaveMessage('Storage bucket not configured. Please contact support.')
+          setTimeout(() => setSaveMessage(''), 5000)
+          return
+        }
+        
         throw new Error(`Upload failed: ${error.message}`)
       }
+      
+      console.log('Upload successful:', data)
       
       // Get public URL
       const { data: pubData } = supabase.storage
@@ -136,6 +148,7 @@ export default function DriverDashboard() {
         .getPublicUrl(path)
       
       const photoUrl = pubData.publicUrl
+      console.log('Public URL:', photoUrl)
       setPhotoPreview(photoUrl)
       
       // Update profile with new photo URL

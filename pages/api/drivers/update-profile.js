@@ -29,12 +29,54 @@ export default async function handler(req, res) {
 
     console.log('Updating profile for user:', id, 'with updates:', cleanUpdates)
 
-    const { data, error } = await supabaseAdmin
+    // First, check if profile exists
+    const { data: existingProfile, error: fetchError } = await supabaseAdmin
       .from('profiles')
-      .update(cleanUpdates)
+      .select('*')
       .eq('id', id)
-      .select()
       .single()
+
+    if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error('Error fetching profile:', fetchError)
+      return res.status(500).json({ 
+        error: 'Failed to fetch profile', 
+        details: fetchError.message 
+      })
+    }
+
+    let data, error
+
+    if (!existingProfile) {
+      // Profile doesn't exist, create it
+      console.log('Profile not found, creating new profile')
+      const newProfile = {
+        id,
+        is_driver: true,
+        is_approved: true,
+        is_available: true,
+        ...cleanUpdates
+      }
+      
+      const result = await supabaseAdmin
+        .from('profiles')
+        .insert(newProfile)
+        .select()
+        .single()
+      
+      data = result.data
+      error = result.error
+    } else {
+      // Profile exists, update it
+      const result = await supabaseAdmin
+        .from('profiles')
+        .update(cleanUpdates)
+        .eq('id', id)
+        .select()
+        .single()
+      
+      data = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('Supabase error:', error)
@@ -45,7 +87,7 @@ export default async function handler(req, res) {
     }
 
     if (!data) {
-      return res.status(404).json({ error: 'Profile not found' })
+      return res.status(404).json({ error: 'Profile not found or could not be created' })
     }
 
     console.log('Profile updated successfully:', data)

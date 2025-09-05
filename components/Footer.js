@@ -60,7 +60,7 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Support</h4>
             <ul className="space-y-3">
               <li>
-                <a href="mailto:easydrivershire1@gmail.com" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <a href="mailto:easydriverhire1@gmail.com" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Contact Support
                 </a>
               </li>

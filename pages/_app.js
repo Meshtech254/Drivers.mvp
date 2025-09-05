@@ -1,10 +1,23 @@
 import '../styles/globals.css'
 import { supabase } from '../lib/supabaseClient'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function App({ Component, pageProps }) {
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    let unsub = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoading(false)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session)
+      setLoading(false)
+      
       if (session?.user) {
         const user = session.user
         let role = user.user_metadata?.role || null
@@ -12,17 +25,32 @@ export default function App({ Component, pageProps }) {
           role = window.localStorage.getItem('selected_role') || null
         }
         const email = user.email
-        await fetch('/api/profile/upsert', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: user.id, email, role })
-        })
+        
+        try {
+          await fetch('/api/profile/upsert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: user.id, email, role })
+          })
+        } catch (error) {
+          console.error('Error upserting profile:', error)
+        }
       }
     })
+
     return () => {
-      try { unsub?.data?.subscription?.unsubscribe?.() } catch (e) {}
+      subscription?.unsubscribe()
     }
   }, [])
 
-  return <Component {...pageProps} supabase={supabase} />
+  // Show loading state while checking session
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  return <Component {...pageProps} supabase={supabase} session={session} />
 }

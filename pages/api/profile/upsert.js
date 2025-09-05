@@ -12,6 +12,8 @@ export default async function handler(req, res) {
       email,
       role: role || null,
       is_driver: isDriver,
+      is_approved: isDriver, // Auto-approve drivers for now
+      is_available: isDriver, // Make drivers available by default
     }
     const { data, error } = await supabaseAdmin.from('profiles').upsert(profile).select().single()
     if (error) return res.status(500).json({ error: error.message })
