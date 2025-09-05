@@ -24,12 +24,21 @@ export default function DriverProfile() {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h2 className="text-2xl font-bold">{driver.full_name}</h2>
-      <p className="mt-2">Experience: {driver.years_experience} years</p>
+      {driver.photo_url && (
+        <img src={driver.photo_url} alt="photo" className="mt-3 w-32 h-32 rounded object-cover" />
+      )}
+      <p className="mt-2">Location: {driver.location || 'N/A'}</p>
+      <p>Availability: {driver.availability || 'N/A'}</p>
+      <p>Vehicle: {driver.vehicle_type || 'N/A'}</p>
+      <p>License: {driver.license_type || 'N/A'}</p>
+      <p>Experience: {driver.years_experience} years</p>
       <p>Rate: {driver.rate}</p>
       <div className="mt-4 space-x-2">
-        <Link href={`/book/${driver.id}`}><a className="px-4 py-2 bg-blue-600 text-white rounded">Request Booking</a></Link>
-        <Link href="/drivers"><a className="px-4 py-2 border rounded">Back</a></Link>
+        <Link
+          href={`/book/${driver.id}`}
+          className="px-4 py-2 bg-blue-600 text-white rounded">Request Booking</Link>
+        <Link href="/drivers" className="px-4 py-2 border rounded">Back</Link>
       </div>
     </div>
-  )
+  );
 }

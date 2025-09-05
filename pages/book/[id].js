@@ -10,8 +10,10 @@ export default function BookPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [message, setMessage] = useState('')
+  const [session, setSession] = useState(null)
 
   useEffect(() => { if (id) fetchDriver() }, [id])
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => setSession(data.session)) }, [])
 
   async function fetchDriver() {
     const { data } = await supabase.from('profiles').select('*').eq('id', id).single()
@@ -23,7 +25,7 @@ export default function BookPage() {
     const res = await fetch('/api/book', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ driver_id: id, client_name: name, client_email: email, client_phone: phone, message })
+      body: JSON.stringify({ driver_id: id, client_name: name, client_email: email, client_phone: phone, message, employer_id: session?.user?.id || null })
     })
     const json = await res.json()
     if (res.ok) {

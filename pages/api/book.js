@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../../lib/supabaseAdmin'
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { driver_id, client_name, client_email, client_phone, message } = req.body
+  const { driver_id, client_name, client_email, client_phone, message, employer_id } = req.body
   if (!driver_id || !client_name || !client_email) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
@@ -14,6 +14,7 @@ export default async function handler(req, res) {
       .from('bookings')
       .insert([{
         driver_id,
+        employer_id,
         client_name,
         client_email,
         client_phone,
@@ -41,12 +42,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ booking })
     }
 
-    const emailBody = `Hello ${driver.full_name || 'Driver'},\n\nYou have a new booking request on Drivers.com:\n\nClient Name: ${client_name}\nEmail: ${client_email}\nPhone: ${client_phone || 'N/A'}\nMessage: ${message || 'N/A'}\n\nPlease reach out to the client directly to confirm the booking.`
+    const emailBody = `Hello ${driver.full_name || 'Driver'},\n\nYou have a new booking request on EasyDriversHire:\n\nClient Name: ${client_name}\nEmail: ${client_email}\nPhone: ${client_phone || 'N/A'}\nMessage: ${message || 'N/A'}\n\nPlease reach out to the client directly to confirm the booking.`
 
     const payload = {
       from: emailFrom,
       to: [driver.email || driver.contact_email || driver.client_email || client_email],
-      subject: 'New Booking Request on Drivers.com',
+      subject: 'New Booking Request on EasyDriversHire',
       text: emailBody
     }
 
@@ -71,6 +72,22 @@ export default async function handler(req, res) {
       // still return success for booking creation, but warn caller
       return res.status(200).json({ booking, emailSent: false, resendError: errText })
     }
+
+    // Also send confirmation to employer
+    const confirmBody = `Hi ${client_name},\n\nYour booking request for ${driver.full_name || 'the driver'} has been sent. The driver will contact you soon.\n\nSummary:\nDriver: ${driver.full_name}\nLocation: ${driver.location || 'N/A'}\nMessage: ${message || 'N/A'}\n\nThank you for using EasyDriversHire!`
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: emailFrom,
+        to: [client_email],
+        subject: 'Your booking request was sent',
+        text: confirmBody
+      })
+    })
 
     return res.status(200).json({ booking, emailSent: true })
   } catch (err) {
