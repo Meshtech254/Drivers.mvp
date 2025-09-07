@@ -65,19 +65,19 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Safety Guidelines
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -87,15 +87,15 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2025 EasyDriversHire. All rights reserved.
+              © 2025 EasyDriverHire. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+              </Link>
+              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>
