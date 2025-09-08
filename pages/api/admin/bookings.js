@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
 	try {
@@ -8,6 +8,7 @@ export default async function handler(req, res) {
 			const size = Math.min(Math.max(parseInt(pageSize, 10) || 20, 1), 100)
 			const from = (pageNum - 1) * size
 			const to = from + size - 1
+			const supabaseAdmin = getSupabaseAdmin()
 			let query = supabaseAdmin.from('bookings').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(from, to)
 			if (status) query = query.eq('status', status)
 			const { data, error, count } = await query
@@ -17,6 +18,7 @@ export default async function handler(req, res) {
 		if (req.method === 'POST') {
 			const { id, status } = req.body || {}
 			if (!id || !status) return res.status(400).json({ error: 'Missing id or status' })
+			const supabaseAdmin = getSupabaseAdmin()
 			const { data, error } = await supabaseAdmin.from('bookings').update({ status }).eq('id', id).select().single()
 			if (error) return res.status(500).json({ error: error.message })
 			return res.status(200).json({ success: true, booking: data })

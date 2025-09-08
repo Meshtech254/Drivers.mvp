@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
 	try {
@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 			const from = (pageNum - 1) * size
 			const to = from + size - 1
 
+			const supabaseAdmin = getSupabaseAdmin()
 			let query = supabaseAdmin
 				.from('profiles')
 				.select('*', { count: 'exact' })

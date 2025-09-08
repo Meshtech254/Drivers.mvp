@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,6 +6,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin()
     // Approve all drivers who are not yet approved
     const { data, error } = await supabaseAdmin
       .from('profiles')

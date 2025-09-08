@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -30,6 +30,7 @@ export default async function handler(req, res) {
     console.log('Updating profile for user:', id, 'with updates:', cleanUpdates)
 
     // First, check if profile exists
+    const supabaseAdmin = getSupabaseAdmin()
     const { data: existingProfile, error: fetchError } = await supabaseAdmin
       .from('profiles')
       .select('*')
