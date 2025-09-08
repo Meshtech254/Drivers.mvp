@@ -35,15 +35,18 @@ export default function KYC() {
       return
     }
 
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
+    const resp = await fetch('/api/profile/kyc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: userData.user.id,
         kyc_id_document_url: idData.path,
         kyc_selfie_url: selfieData.path,
-        kyc_dob: dob,
-        kyc_status: 'pending'
+        kyc_dob: dob
       })
-      .eq('id', userData.user.id)
+    })
+    const { error: updateErrorApi } = await resp.json().catch(() => ({ error: 'KYC API error' }))
+    if (!resp.ok || updateErrorApi) return setMessage('Profile update failed: ' + (updateErrorApi || 'Unknown'))
     if (updateError) return setMessage('Profile update failed: ' + updateError.message)
 
     setMessage('KYC submitted! Await admin approval.')

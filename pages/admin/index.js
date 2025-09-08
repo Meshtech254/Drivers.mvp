@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import Navigation from '../../components/Navigation'
 import Footer from '../../components/Footer'
+import ReportsList from './reports-list'
 
 export default function AdminDashboard() {
 	const [session, setSession] = useState(null)
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
 			<main className="max-w-7xl mx-auto px-6 py-8">
 				<h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 				<div className="flex gap-2 mb-6">
-					{['overview','users','kyc','bookings'].map(tab => (
+					{['overview','users','kyc','bookings','reports'].map(tab => (
 						<button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 py-2 rounded-md ${activeTab === tab ? 'bg-blue-600 text-white' : 'bg-white border'}`}>{tab.toUpperCase()}</button>
 					))}
 				</div>
@@ -154,6 +155,10 @@ export default function AdminDashboard() {
 						</div>
 						<div className="text-sm text-gray-600 mt-3">Total: {bookingsTotal}</div>
 					</div>
+				)}
+
+				{activeTab === 'reports' && (
+					<ReportsList />
 				)}
 			</main>
 			<Footer />
