@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    const supabaseAdmin = getSupabaseAdmin()
     // Save booking to Supabase
     const { data: booking, error: insertErr } = await supabaseAdmin
       .from('bookings')

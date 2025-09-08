@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../lib/supabaseAdmin'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
   try {
     // Test if the storage bucket exists
+    const supabaseAdmin = getSupabaseAdmin()
     const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets()
     
     if (bucketsError) {
