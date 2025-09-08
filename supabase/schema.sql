@@ -23,6 +23,10 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
+-- Ensure admin/role columns exist for policies
+alter table if exists profiles add column if not exists is_admin boolean default false;
+alter table if exists profiles add column if not exists role text;
+
 create table if not exists bookings (
   id uuid primary key default gen_random_uuid(),
   client_name text,
@@ -79,7 +83,13 @@ end $$;
 do $$ begin
   perform 1 from pg_policies where tablename = 'reports' and policyname = 'reports_select_admin';
   if not found then
-    create policy reports_select_admin on reports for select to authenticated using (exists (select 1 from profiles p where p.id = auth.uid() and (p.is_admin = true or p.role = 'admin')));
+    create policy reports_select_admin on reports for select to authenticated using (
+      exists (
+        select 1 from profiles p 
+        where p.id = auth.uid() 
+        and coalesce(p.is_admin, false) = true
+      )
+    );
   end if;
 end $$;
 

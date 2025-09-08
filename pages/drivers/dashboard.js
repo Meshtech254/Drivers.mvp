@@ -12,6 +12,7 @@ export default function DriverDashboard() {
   const [photoPreview, setPhotoPreview] = useState('')
   const [saveMessage, setSaveMessage] = useState('')
   const [kycStatus, setKycStatus] = useState('')
+  const [showFeedback, setShowFeedback] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -21,6 +22,22 @@ export default function DriverDashboard() {
         loadBookings(data.session.user.id)
       }
     })
+  }, [])
+
+  // Feedback popup after 7 days
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const key = 'edh_first_seen'
+    const now = Date.now()
+    const stored = window.localStorage.getItem(key)
+    if (!stored) {
+      window.localStorage.setItem(key, String(now))
+      return
+    }
+    const elapsed = now - Number(stored)
+    if (elapsed > 7 * 24 * 60 * 60 * 1000) {
+      setShowFeedback(true)
+    }
   }, [])
 
   async function loadProfile(id) {
@@ -481,6 +498,20 @@ export default function DriverDashboard() {
       </main>
       
       <Footer />
+      {/* 7-day Feedback Popup */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-40">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md text-center">
+            <h3 className="text-lg font-semibold mb-2">How is EasyDriverHire so far?</h3>
+            <p className="text-gray-600 mb-4">We'd love your feedback to improve the platform.</p>
+            <a href="https://forms.gle/J3MPWRbNRcE9gEyd9" target="_blank" rel="noopener noreferrer" className="btn-primary inline-block mb-3">Give Feedback</a>
+            <div className="flex justify-center gap-2">
+              <button onClick={()=>setShowFeedback(false)} className="px-3 py-2 border rounded">Maybe later</button>
+              <button onClick={()=>{ setShowFeedback(false); localStorage.setItem('edh_first_seen', String(Date.now())); }} className="px-3 py-2 bg-gray-800 text-white rounded">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

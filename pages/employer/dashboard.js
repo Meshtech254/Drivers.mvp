@@ -8,6 +8,12 @@ export default function EmployerDashboard() {
   const [session, setSession] = useState(null)
   const [bookings, setBookings] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [showReview, setShowReview] = useState(false)
+  const [reviewBooking, setReviewBooking] = useState(null)
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState('')
+  const [reviewMsg, setReviewMsg] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -17,6 +23,22 @@ export default function EmployerDashboard() {
         loadFavorites(data.session.user.id)
       }
     })
+  }, [])
+
+  // Feedback popup after 7 days
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const key = 'edh_first_seen'
+    const now = Date.now()
+    const stored = window.localStorage.getItem(key)
+    if (!stored) {
+      window.localStorage.setItem(key, String(now))
+      return
+    }
+    const elapsed = now - Number(stored)
+    if (elapsed > 7 * 24 * 60 * 60 * 1000) {
+      setShowFeedback(true)
+    }
   }, [])
 
   async function loadBookings(id) {
@@ -117,6 +139,14 @@ export default function EmployerDashboard() {
                         >
                           View Driver
                         </Link>
+                        {b.status === 'completed' && (
+                          <button
+                            onClick={() => { setReviewBooking(b); setShowReview(true); setRating(5); setComment(''); setReviewMsg('') }}
+                            className="px-4 py-2 bg-green-600 text-white rounded text-sm"
+                          >
+                            Leave a Review
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -240,6 +270,57 @@ export default function EmployerDashboard() {
         </div>
       </main>
       
+      {/* Review Modal */}
+      {showReview && reviewBooking && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-3">Leave a Review</h3>
+            <label className="block text-sm font-medium mb-1">Rating</label>
+            <select value={rating} onChange={e=>setRating(Number(e.target.value))} className="w-full border rounded px-3 py-2 mb-3">
+              {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+            </select>
+            <label className="block text-sm font-medium mb-1">Comment (optional)</label>
+            <textarea value={comment} onChange={e=>setComment(e.target.value)} maxLength={1000} className="w-full border rounded px-3 py-2 mb-3" placeholder="Share feedback (max 250 words)" />
+            <div className="flex justify-end gap-2">
+              <button onClick={()=>{setShowReview(false); setReviewBooking(null)}} className="px-3 py-2 border rounded">Cancel</button>
+              <button
+                onClick={async ()=>{
+                  const uid = session?.user?.id
+                  if (!uid) { setReviewMsg('Please log in.'); return }
+                  const resp = await fetch('/api/reviews/create', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewer_id: uid, reviewed_user_id: reviewBooking.driver_id, booking_id: reviewBooking.id, rating, comment })
+                  })
+                  if (resp.ok) {
+                    setReviewMsg('✅ Thank you for your feedback. Your review helps build trust.')
+                    setTimeout(()=>{ setShowReview(false); setReviewBooking(null); setReviewMsg('') }, 1200)
+                  } else {
+                    setReviewMsg('Could not submit review. Try again later.')
+                  }
+                }}
+                className="px-3 py-2 bg-blue-600 text-white rounded"
+              >Submit</button>
+            </div>
+            {reviewMsg && <p className="text-sm mt-2">{reviewMsg}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* 7-day Feedback Popup */}
+      {showFeedback && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-40">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md text-center">
+            <h3 className="text-lg font-semibold mb-2">How is EasyDriverHire so far?</h3>
+            <p className="text-gray-600 mb-4">We'd love your feedback to improve the platform.</p>
+            <a href="https://forms.gle/J3MPWRbNRcE9gEyd9" target="_blank" rel="noopener noreferrer" className="btn-primary inline-block mb-3">Give Feedback</a>
+            <div className="flex justify-center gap-2">
+              <button onClick={()=>setShowFeedback(false)} className="px-3 py-2 border rounded">Maybe later</button>
+              <button onClick={()=>{ setShowFeedback(false); localStorage.setItem('edh_first_seen', String(Date.now())); }} className="px-3 py-2 bg-gray-800 text-white rounded">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   )
