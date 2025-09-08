@@ -51,7 +51,7 @@ export default function Terms() {
 						</section>
 						<section>
 							<h2 className="font-semibold mb-2">11. Governing Law</h2>
-							<p>These Terms are governed by the laws of Kenya. Any disputes will be resolved in the courts of Kenya.</p>
+							<p>These Terms are governed by the laws of Kenya. Any disputes will be resolved in the courts of Law.</p>
 						</section>
 						<div className="pt-2">
 							<a href="/safety" className="text-blue-600 hover:underline">View Safety Guidelines</a>
