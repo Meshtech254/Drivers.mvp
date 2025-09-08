@@ -5,7 +5,7 @@ import Footer from '../../components/Footer'
 
 export default function AdminDashboard() {
 	const [session, setSession] = useState(null)
-	const [isAdmin, setIsAdmin] = useState(false)
+	const [isAdmin, setIsAdmin] = useState(true) // Temporarily open access
 	const [activeTab, setActiveTab] = useState('overview')
 	const [stats, setStats] = useState({ users: 0, drivers: 0, pendingKyc: 0, bookings: 0 })
 	const [users, setUsers] = useState([])
@@ -17,10 +17,8 @@ export default function AdminDashboard() {
 	useEffect(() => {
 		supabase.auth.getSession().then(async ({ data }) => {
 			setSession(data.session)
-			if (data.session?.user?.id) {
-				const { data: profile } = await supabase.from('profiles').select('role,is_admin').eq('id', data.session.user.id).single()
-				setIsAdmin(!!profile?.is_admin || profile?.role === 'admin')
-			}
+			// Bypass admin check for preview
+			setIsAdmin(true)
 		})
 	}, [])
 
@@ -64,31 +62,7 @@ export default function AdminDashboard() {
 		loadUsers()
 	}
 
-	if (!session) {
-		return (
-			<div className="min-h-screen bg-gray-50">
-				<Navigation />
-				<div className="max-w-4xl mx-auto p-6">
-					<h2 className="text-2xl font-bold">Admin</h2>
-					<p>Please sign in to access admin dashboard.</p>
-				</div>
-				<Footer />
-			</div>
-		)
-	}
-
-	if (!isAdmin) {
-		return (
-			<div className="min-h-screen bg-gray-50">
-				<Navigation />
-				<div className="max-w-4xl mx-auto p-6">
-					<h2 className="text-2xl font-bold">Admin</h2>
-					<p>You do not have permission to access this page.</p>
-				</div>
-				<Footer />
-			</div>
-		)
-	}
+	// Open access: no gating while you review
 
 	return (
 		<div className="min-h-screen bg-gray-50">
