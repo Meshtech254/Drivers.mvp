@@ -11,6 +11,7 @@ export default function DriverDashboard() {
   const [uploading, setUploading] = useState(false)
   const [photoPreview, setPhotoPreview] = useState('')
   const [saveMessage, setSaveMessage] = useState('')
+  const [kycStatus, setKycStatus] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -26,6 +27,7 @@ export default function DriverDashboard() {
     const { data } = await supabase.from('profiles').select('*').eq('id', id).single()
     setProfile(data)
     setIsAvailable(!!data?.is_available)
+    setKycStatus(data?.kyc_status || '')
   }
 
   async function loadBookings(id) {
@@ -209,6 +211,19 @@ export default function DriverDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
+            {/* KYC Status */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="text-xl font-semibold text-gray-900">KYC</h3>
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600">Status: {kycStatus || 'not submitted'}</p>
+                  <p className="text-sm text-gray-500">Submit your ID and selfie for verification</p>
+                </div>
+                <a href="/drivers/kyc" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Open KYC</a>
+              </div>
+            </div>
             {/* Availability Status */}
             <div className="card">
               <div className="card-header">
