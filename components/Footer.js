@@ -65,17 +65,17 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/help" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Help Center
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/safety" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Safety Guidelines
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                <Link href="/terms" className="text-gray-300 hover:text-blue-400 transition-colors">
                   Terms of Service
                 </Link>
               </li>
@@ -90,10 +90,10 @@ export default function Footer() {
               © 2025 EasyDriverHire. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+              <Link href="/terms#content-and-data" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
+              <Link href="/terms#cookies" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">
                 Cookie Policy
               </Link>
             </div>

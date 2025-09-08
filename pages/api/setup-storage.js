@@ -17,6 +17,7 @@ export default async function handler(req, res) {
     }
 
     const driverPhotosBucket = buckets.find(bucket => bucket.id === 'driver-photos')
+    const kycDocsBucket = buckets.find(bucket => bucket.id === 'kyc-docs')
     
     if (!driverPhotosBucket) {
       // Create the bucket
@@ -32,19 +33,33 @@ export default async function handler(req, res) {
           details: createError.message 
         })
       }
-
-      return res.status(200).json({ 
-        success: true,
-        message: 'Storage bucket created successfully',
-        bucket: newBucket
-      })
     } else {
-      return res.status(200).json({ 
-        success: true,
-        message: 'Storage bucket already exists',
-        bucket: driverPhotosBucket
-      })
+      // no-op
     }
+
+    if (!kycDocsBucket) {
+      const { data: newKycBucket, error: kycCreateError } = await supabaseAdmin.storage.createBucket('kyc-docs', {
+        public: true,
+        fileSizeLimit: 52428800, // 50MB
+        allowedMimeTypes: ['image/*', 'application/pdf']
+      })
+
+      if (kycCreateError) {
+        return res.status(500).json({
+          error: 'Failed to create kyc-docs bucket',
+          details: kycCreateError.message
+        })
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Storage buckets ready',
+      buckets: {
+        driverPhotos: driverPhotosBucket ? 'exists' : 'created',
+        kycDocs: kycDocsBucket ? 'exists' : 'created'
+      }
+    })
 
   } catch (error) {
     console.error('Unexpected error:', error)

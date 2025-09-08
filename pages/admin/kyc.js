@@ -24,8 +24,8 @@ export default function AdminKYC() {
         <div key={profile.id} style={{border: '1px solid #ccc', margin: 8, padding: 8}}>
           <p>User: {profile.id}</p>
           <p>DOB: {profile.kyc_dob}</p>
-          <a href={`https://ruaqklnsrverdpotiand.supabase.co/storage/v1/object/public/kyc-docs/${profile.kyc_id_document_url}`} target="_blank" rel="noopener noreferrer">View ID</a><br/>
-          <a href={`https://ruaqklnsrverdpotiand.supabase.co/storage/v1/object/public/kyc-docs/${profile.kyc_selfie_url}`} target="_blank" rel="noopener noreferrer">View Selfie</a><br/>
+          <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_id_document_url}`} target="_blank" rel="noopener noreferrer">View ID</a><br/>
+          <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_selfie_url}`} target="_blank" rel="noopener noreferrer">View Selfie</a><br/>
           <button onClick={() => handleVerify(profile.id, 'approved')}>Approve</button>
           <button onClick={() => handleVerify(profile.id, 'rejected')}>Reject</button>
         </div>

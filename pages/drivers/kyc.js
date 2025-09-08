@@ -28,7 +28,13 @@ export default function KYC() {
     if (selfieError) return setMessage('Selfie upload failed: ' + selfieError.message)
 
     // Update profile
-    const user = supabase.auth.getUser()
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    if (userError || !userData?.user) {
+      setMessage('Unable to get current user.')
+      setLoading(false)
+      return
+    }
+
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
@@ -37,7 +43,7 @@ export default function KYC() {
         kyc_dob: dob,
         kyc_status: 'pending'
       })
-      .eq('id', (await user).data.user.id)
+      .eq('id', userData.user.id)
     if (updateError) return setMessage('Profile update failed: ' + updateError.message)
 
     setMessage('KYC submitted! Await admin approval.')
@@ -45,16 +51,26 @@ export default function KYC() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>KYC Verification</h2>
-      <label>Date of Birth:</label>
-      <input type="date" value={dob} onChange={e => setDob(e.target.value)} required />
-      <label>Upload ID Document:</label>
-      <input type="file" accept="image/*,application/pdf" onChange={e => setIdFile(e.target.files[0])} required />
-      <label>Upload Selfie:</label>
-      <input type="file" accept="image/*" onChange={e => setSelfieFile(e.target.files[0])} required />
-      <button type="submit" disabled={loading}>Submit KYC</button>
-      <p>{message}</p>
-    </form>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-xl mx-auto px-4 py-10">
+        <h2 className="text-2xl font-bold mb-4">KYC Verification</h2>
+        <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+            <input type="date" value={dob} onChange={e => setDob(e.target.value)} required className="w-full px-3 py-2 border rounded-md" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload ID Document</label>
+            <input type="file" accept="image/*,application/pdf" onChange={e => setIdFile(e.target.files[0])} required className="w-full" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Selfie</label>
+            <input type="file" accept="image/*" onChange={e => setSelfieFile(e.target.files[0])} required className="w-full" />
+          </div>
+          <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">{loading ? 'Submitting...' : 'Submit KYC'}</button>
+          {message && <p className="text-sm text-gray-700">{message}</p>}
+        </form>
+      </div>
+    </div>
   )
 }
