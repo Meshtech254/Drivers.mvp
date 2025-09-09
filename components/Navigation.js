@@ -45,9 +45,6 @@ export default function Navigation() {
             <Link href="/drivers" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
               Browse Drivers
             </Link>
-            <Link href="/help" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
-              Help Center
-            </Link>
             {session?.user ? (
               <>
                 <Link href="/employer/dashboard" className="text-gray-700 hover:text-green-600 transition-colors font-medium px-3 py-2 rounded-lg hover:bg-white/50">

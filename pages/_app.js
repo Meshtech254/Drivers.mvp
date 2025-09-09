@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 import { supabase } from '../lib/supabaseClient'
 import { useEffect, useState } from 'react'
+import HelpFloating from '../components/HelpFloating'
 
 export default function App({ Component, pageProps }) {
   const [session, setSession] = useState(null)
@@ -52,5 +53,10 @@ export default function App({ Component, pageProps }) {
     )
   }
 
-  return <Component {...pageProps} supabase={supabase} session={session} />
+  return (
+    <>
+      <Component {...pageProps} supabase={supabase} session={session} />
+      <HelpFloating />
+    </>
+  )
 }

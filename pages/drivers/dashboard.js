@@ -61,8 +61,7 @@ export default function DriverDashboard() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: session.user.id, is_available: next })
     })
-      // Don't reload profile immediately to prevent state reset
-      // loadProfile(session.user.id)
+      await loadProfile(session.user.id)
     } catch (error) {
       console.error('Error toggling availability:', error)
       // Revert state on error
@@ -229,18 +228,20 @@ export default function DriverDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* KYC Status */}
-            <div className="card">
-              <div className="card-header">
-                <h3 className="text-xl font-semibold text-gray-900">KYC</h3>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600">Status: {kycStatus || 'not submitted'}</p>
-                  <p className="text-sm text-gray-500">Submit your ID and selfie for verification</p>
+            {(!kycStatus || kycStatus === 'rejected' || kycStatus === 'pending') && (
+              <div className="card">
+                <div className="card-header">
+                  <h3 className="text-xl font-semibold text-gray-900">KYC</h3>
                 </div>
-                <a href="/drivers/kyc" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Open KYC</a>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600">Status: {kycStatus || 'not submitted'}</p>
+                    <p className="text-sm text-gray-500">Submit your ID and selfie for verification</p>
+                  </div>
+                  <a href="/drivers/kyc" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Open KYC</a>
+                </div>
               </div>
-            </div>
+            )}
             {/* Availability Status */}
             <div className="card">
               <div className="card-header">

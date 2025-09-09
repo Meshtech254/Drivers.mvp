@@ -23,6 +23,18 @@ export default function AdminKYC() {
 
   const handleVerify = async (id, status) => {
     await supabase.from('profiles').update({ kyc_status: status }).eq('id', id)
+    // fire-and-forget email
+    try {
+      const { data: userProfile } = await supabase.from('profiles').select('email').eq('id', id).single()
+      const to = userProfile?.email
+      if (to) {
+        const subject = status === 'approved' ? 'Your KYC has been verified' : status === 'rejected' ? 'Your KYC was rejected' : 'KYC update'
+        const text = status === 'approved'
+          ? 'Your KYC has been verified successfully.'
+          : 'Your KYC was rejected, please resubmit your documents.'
+        fetch('/api/notifications/send-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to, subject, text }) })
+      }
+    } catch (e) { /* ignore */ }
     setProfiles(profiles.filter(p => p.id !== id))
   }
 
