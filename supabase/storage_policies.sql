@@ -40,3 +40,8 @@ WITH CHECK (bucket_id = 'kyc-docs');
 CREATE POLICY "Allow public to view KYC docs" ON storage.objects
 FOR SELECT TO public
 USING (bucket_id = 'kyc-docs');
+
+-- Allow users to delete their own KYC docs
+CREATE POLICY "Allow users to delete their own KYC" ON storage.objects
+FOR DELETE TO authenticated
+USING (bucket_id = 'kyc-docs' AND auth.uid()::text = (storage.foldername(name))[1]);

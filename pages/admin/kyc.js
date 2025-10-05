@@ -23,18 +23,34 @@ export default function AdminKYC() {
 
   const handleVerify = async (id, status) => {
     await supabase.from('profiles').update({ kyc_status: status }).eq('id', id)
-    // fire-and-forget email
+    
+    // Send email notification
     try {
       const { data: userProfile } = await supabase.from('profiles').select('email').eq('id', id).single()
       const to = userProfile?.email
       if (to) {
-        const subject = status === 'approved' ? 'Your KYC has been verified' : status === 'rejected' ? 'Your KYC was rejected' : 'KYC update'
-        const text = status === 'approved'
-          ? 'Your KYC has been verified successfully.'
-          : 'Your KYC was rejected, please resubmit your documents.'
-        fetch('/api/notifications/send-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to, subject, text }) })
+        let subject, text
+        if (status === 'approved') {
+          subject = 'KYC Verified Successfully'
+          text = 'Congratulations! Your KYC has been verified successfully. You can now access all driver features on our platform.'
+        } else if (status === 'rejected') {
+          subject = 'KYC Documents Declined'
+          text = 'Your KYC documents have been declined. Please review and upload your documents again. Make sure all documents are clear and valid.'
+        } else {
+          subject = 'KYC Status Update'
+          text = 'Your KYC status has been updated.'
+        }
+        
+        await fetch('/api/notifications/send-email', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' }, 
+          body: JSON.stringify({ to, subject, text }) 
+        })
       }
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      console.error('Email notification failed:', e)
+    }
+    
     setProfiles(profiles.filter(p => p.id !== id))
   }
 
@@ -48,13 +64,23 @@ export default function AdminKYC() {
         <div className="space-y-4">
           {profiles.map(profile => (
             <div key={profile.id} className="p-4 bg-white border rounded-lg">
-              <p className="font-medium">User: {profile.id}</p>
+              <p className="font-medium">User: {profile.full_name || profile.id}</p>
+              <p className="text-sm text-gray-600">Email: {profile.email}</p>
               <p className="text-sm text-gray-700">DOB: {profile.kyc_dob}</p>
-              <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_id_document_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View ID</a><br/>
-              <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_selfie_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Selfie</a><br/>
-              <div className="mt-2 space-x-2">
-                <button onClick={() => handleVerify(profile.id, 'approved')} className="px-3 py-1 bg-green-600 text-white rounded">Approve</button>
-                <button onClick={() => handleVerify(profile.id, 'rejected')} className="px-3 py-1 bg-red-600 text-white rounded">Reject</button>
+              <div className="mt-3 space-y-2">
+                <div>
+                  <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_id_document_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View ID Document</a>
+                </div>
+                <div>
+                  <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_selfie_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Selfie</a>
+                </div>
+                <div>
+                  <a href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kyc-docs/${profile.kyc_drivers_license_url}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Driver's License</a>
+                </div>
+              </div>
+              <div className="mt-4 space-x-2">
+                <button onClick={() => handleVerify(profile.id, 'approved')} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Approve</button>
+                <button onClick={() => handleVerify(profile.id, 'rejected')} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Decline</button>
               </div>
             </div>
           ))}

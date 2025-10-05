@@ -45,6 +45,10 @@ export default function DriverDashboard() {
     setProfile(data)
     setIsAvailable(!!data?.is_available)
     setKycStatus(data?.kyc_status || '')
+    // Update photo preview if profile has photo
+    if (data?.photo_url) {
+      setPhotoPreview(data.photo_url)
+    }
   }
 
   async function loadBookings(id) {
@@ -56,16 +60,23 @@ export default function DriverDashboard() {
     const next = !isAvailable
     setIsAvailable(next)
     try {
-    await fetch('/api/drivers/toggle-availability', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: session.user.id, is_available: next })
-    })
+      const response = await fetch('/api/drivers/toggle-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: session.user.id, is_available: next })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to update availability')
+      }
+      
       await loadProfile(session.user.id)
     } catch (error) {
       console.error('Error toggling availability:', error)
       // Revert state on error
       setIsAvailable(!next)
+      setSaveMessage('Failed to update availability. Please try again.')
+      setTimeout(() => setSaveMessage(''), 3000)
     }
   }
 

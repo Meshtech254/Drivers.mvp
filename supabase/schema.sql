@@ -19,6 +19,7 @@ create table if not exists profiles (
   kyc_status text,
   kyc_id_document_url text,
   kyc_selfie_url text,
+  kyc_drivers_license_url text,
   kyc_dob date,
   created_at timestamptz default now()
 );
