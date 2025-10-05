@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Progressive Web App for managing user profiles">
+    <meta name="theme-color" content="#3b82f6">
     <title>User Profiles App</title>
+    <link rel="icon" type="image/png" href="%PUBLIC_URL%/icons/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/icons/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/icons/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/icons/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="EasyDriverHire" />
+    <link rel="manifest" href="%PUBLIC_URL%/icons/favicon/site.webmanifest" />
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="root"></div>
     <script src="bundle.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => console.log('SW registered:', registration))
+                    .catch(error => console.log('SW registration failed:', error));
+            });
+        }
+    </script>
 </body>
 </html>
