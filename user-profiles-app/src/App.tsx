@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import CreateDriver from './pages/CreateDriver';
 import EditDriver from './pages/EditDriver';
+import InstallPWA from './components/InstallPWA';
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/driver/edit/:id" component={EditDriver} />
         <Route path="/profile/:id" component={Profile} />
       </Switch>
+      <InstallPWA />
     </Router>
   );
 };
