@@ -1,57 +1,60 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../services/supabaseClient';
+import { fetchDriverById, updateDriver } from '../services/supabaseClient';
 import UserProfile from '../components/UserProfile';
+import { Driver } from '../types';
 
 const Profile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [user, setUser] = useState<any>(null);
+    const [driver, setDriver] = useState<Driver | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', id)
-                .single();
-
-            if (error) {
-                console.error('Error fetching user profile:', error);
-            } else {
-                setUser(data);
+        const loadDriver = async () => {
+            try {
+                setLoading(true);
+                const data = await fetchDriverById(id);
+                setDriver(data);
+            } catch (err: any) {
+                console.error('Error fetching driver:', err);
+                setError(err.message);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
-        fetchUserProfile();
+        if (id) {
+            loadDriver();
+        }
     }, [id]);
 
-    const handleEdit = async (updatedUser: any) => {
-        const { error } = await supabase
-            .from('profiles')
-            .update(updatedUser)
-            .eq('id', id);
-
-        if (error) {
-            console.error('Error updating user profile:', error);
-        } else {
-            setUser(updatedUser);
+    const handleEdit = async (updatedDriver: any) => {
+        try {
+            await updateDriver(id, updatedDriver);
+            setDriver(updatedDriver);
+        } catch (err: any) {
+            console.error('Error updating driver:', err);
+            alert('Failed to update driver: ' + err.message);
         }
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>Loading driver profile...</div>;
     }
 
-    if (!user) {
-        return <div>User not found</div>;
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!driver) {
+        return <div>Driver not found</div>;
     }
 
     return (
         <div>
-            <h1>User Profile</h1>
-            <UserProfile user={user} onEdit={handleEdit} />
+            <h1>Driver Profile</h1>
+            <UserProfile user={driver} onEdit={handleEdit} />
         </div>
     );
 };

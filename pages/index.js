@@ -34,7 +34,7 @@ export default function Home() {
                   <span className="company-name-green text-green-200">Driver</span>
                   <span className="company-name-orange text-orange-200">Hire</span>
                 </span>
-                <span className="block text-white">Find Trusted Drivers Near You</span>
+                <span className="block text-white">Hire Trusted Drivers Near You</span>
               </h1>
               <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
                 Connect with reliable drivers across Kenya. Part-time or full-time opportunities in Nairobi, Kisumu, and more.
