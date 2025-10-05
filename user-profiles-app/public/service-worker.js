@@ -2,12 +2,7 @@ const CACHE_NAME = 'user-profiles-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/styles.css',
-  '/bundle.js',
-  '/icons/favicon/site.webmanifest',
-  '/icons/favicon/web-app-manifest-192x192.png',
-  '/icons/favicon/web-app-manifest-512x512.png',
-  '/icons/favicon/favicon.ico'
+  '/manifest.json'
 ];
 
 // Install event - cache resources
